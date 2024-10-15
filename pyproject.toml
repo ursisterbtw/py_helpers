@@ -1,7 +1,7 @@
 [project]
-name = "setup-utils"
+name = "py-helpers"
 version = "0.1.0"
-description = "A collection of scripts designed to expedite the setup of new environments and streamline various tasks"
+description = "scripts designed to expedite the setup of new environments and streamline various tasks"
 readme = "README.md"
 requires-python = ">=3.12.7"
 
