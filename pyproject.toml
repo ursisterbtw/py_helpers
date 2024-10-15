@@ -3,29 +3,61 @@ name = "setup-utils"
 version = "0.1.0"
 description = "A collection of scripts designed to expedite the setup of new environments and streamline various tasks"
 readme = "README.md"
-requires-python = "==3.12.7"
+requires-python = ">=3.12.7"
+
 dependencies = [
+    # development tools
     "uv",
     "ruff",
-    "setuptools",
-    "wheel",
-    "requests",
-    "urllib3",
     "cython",
     "cytoolz",
+    "toolz",
+    "setuptools",
+    "wheel",
+    "python-dev-tools",
+    "snakeviz",
+
+    # networking and http
+    "requests",
+    "urllib3",
+    "aiohttp",
+    "httpx[http2]",
+    "uvicorn[standard]",
+    "click",
+    "certifi",
+    "idna",
+    "charset-normalizer",
+    "aiosignal",
+    "async-timeout",
+    "frozenlist",
+
+    # async programming
+    "asyncio",
+    "tornado",
+
+    # ethereum and blockchain
     "web3",
     "flashbots",
     "eth-account",
+    "eth-typing",
+    "eth-utils",
+    "eth-hash",
     "multicall",
+
+    # data processing and analysis
+    "numpy",
+    "pandas",
+    "pyarrow",
+    "sqlalchemy",
+    "tables",
+
+    # utilities and helpers
     "lru-cache",
-    "python-dev-tools",
-    "snakeviz",
-    "tornado",
-    "uvicorn[standard]",
-    "httpx[http2]",
-    "aiohttp",
-    "asyncio",
     "multidict",
+    "pydantic",
+    "pyyaml",
+    "rich",
+    "tqdm",
 ]
 
 [tool.ruff]
