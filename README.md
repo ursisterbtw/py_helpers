@@ -1,6 +1,5 @@
 # py_helpers
 
-<img src="docs/nice_snek.png" width="320" />
 
 ## A collection of scripts designed to expedite the setup of new environments and streamline various tasks
 
