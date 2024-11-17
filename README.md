@@ -12,3 +12,4 @@
 - `delete_all_models.py`: Removes all installed llms.
 - `fun_dirs` Configurable settings for turning your folders into emojis. Don't go too crazy!
 - `gen_abi.py` generates required abi files.
+- `file_buddy.py` converts .json files to .txt and vice versa
