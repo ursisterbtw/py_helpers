@@ -1,6 +1,7 @@
+import json
 import os
 import re
-import json
+
 from bs4 import BeautifulSoup
 
 SC_RAPE_DIR = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scRape"))

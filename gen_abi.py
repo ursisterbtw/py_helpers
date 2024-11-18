@@ -1,11 +1,12 @@
 import json
 import os
 import time
-import requests
-from typing import Dict, List, Optional
-from dotenv import load_dotenv
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+from typing import List, Optional
+
+import requests
+from dotenv import load_dotenv
 
 # Load .env file
 load_dotenv()

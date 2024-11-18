@@ -1,6 +1,7 @@
-import os
-import requests
 import logging
+import os
+
+import requests
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
