@@ -1,10 +1,16 @@
+"""
+JSON Configuration Injector.
+
+This script allows you to load a JSON configuration file, inject a new command,
+and save the updated configuration back to the file.
+"""
+
 import json
-import os
 
 def load_config(file_path):
     """Load JSON configuration from a file."""
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             return json.load(file)
     except FileNotFoundError:
         print(f"Error: The file {file_path} does not exist.")
@@ -15,7 +21,7 @@ def load_config(file_path):
 
 def save_config(file_path, config):
     """Save JSON configuration to a file."""
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w', encoding='utf-8') as file:
         json.dump(config, file, indent=4)
 
 def inject_command(config, command_key, command_value):
@@ -24,19 +30,21 @@ def inject_command(config, command_key, command_value):
     return config
 
 def main():
-    config_file = r"C:\Users\sister\.config\waveterm\settings.json"  # path to your JSON configuration file
+    """Main function to load, inject, and save JSON configuration."""
+    config_file = r"C:\Users\sister\.config\waveterm\settings.json"
 
+    # load the current configuration
     config = load_config(config_file)
 
+    # print the current configuration for reference
     print("Current Configuration:")
     print(json.dumps(config, indent=4))
 
-    # define what you want to inject
-    command_key = input("Enter the configuration key to inject (leave blank to skip): ")
-    
-    if command_key:
+    if command_key := input(
+        "Enter the configuration key to inject (leave blank to skip): "
+    ):
         command_value = input("Enter the value for the configuration key: ")
-    
+
         # inject the command
         config = inject_command(config, command_key, command_value)
 
