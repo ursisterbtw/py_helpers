@@ -31,7 +31,7 @@ def inject_command(config, command_key, command_value):
 
 def main():
     """Main function to load, inject, and save JSON configuration."""
-    config_file = r"C:\Users\sister\.config\waveterm\settings.json"
+    config_file = r"PATH/TO/CONFIG/FILE"
 
     # load the current configuration
     config = load_config(config_file)
