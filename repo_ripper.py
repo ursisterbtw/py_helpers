@@ -2,7 +2,7 @@
 repo_ripper.py
 
 a tool that provides functionality to clone repositories from GitHub organizations 
-via a TUI/CLI.
+via CLI.
 """
 
 import argparse
