@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """
-configuratoor: A tool to automatically prettify and organize configuration files with visual separators and comments.
+configuratoor: a CLI tool to prettify and organize configuration files with visual separators and comments.
 
 supported Formats: TOML, YAML, INI
 
 usage:
-    configuratoor.py --file path/to/config/to/lint.toml --format toml/yaml/ini/etc
+    configuratoor_cli.py <command> [options]
+
+commands:
+    prettify-toml    prettify a TOML configuration file
+    prettify-yaml    prettify a YAML configuration file
+    prettify-ini     prettify an INI configuration file
 """
 
 import argparse
@@ -34,12 +39,29 @@ EMOJI_SEPARATORS = {
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Prettify and organize configuration files with visual separators and comments.")
-    parser.add_argument('--file', '-f', required=True, help='Path to the configuration file.')
-    parser.add_argument('--format', '-t', required=True, choices=['toml', 'yaml', 'ini'], help='Format of the configuration file.')
-    parser.add_argument('--separator', '-s', choices=SEPARATOR_STYLES.keys(), default='equals', help='Style of separator lines.')
-    parser.add_argument('--backup', '-b', action='store_true', help='Create a backup of the original config file.')
-    parser.add_argument('--emoji', '-e', action='store_true', help='Use emojis in section headers.')
-    parser.add_argument('--output', '-o', help='Path to save the prettified config. Defaults to overwriting the original file.')
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    prettify_toml_parser = subparsers.add_parser('prettify-toml', help='Prettify a TOML configuration file')
+    prettify_toml_parser.add_argument('--file', '-f', required=True, help='Path to the configuration file.')
+    prettify_toml_parser.add_argument('--separator', '-s', choices=SEPARATOR_STYLES.keys(), default='equals', help='Style of separator lines.')
+    prettify_toml_parser.add_argument('--backup', '-b', action='store_true', help='Create a backup of the original config file.')
+    prettify_toml_parser.add_argument('--emoji', '-e', action='store_true', help='Use emojis in section headers.')
+    prettify_toml_parser.add_argument('--output', '-o', help='Path to save the prettified config. Defaults to overwriting the original file.')
+
+    prettify_yaml_parser = subparsers.add_parser('prettify-yaml', help='Prettify a YAML configuration file')
+    prettify_yaml_parser.add_argument('--file', '-f', required=True, help='Path to the configuration file.')
+    prettify_yaml_parser.add_argument('--separator', '-s', choices=SEPARATOR_STYLES.keys(), default='equals', help='Style of separator lines.')
+    prettify_yaml_parser.add_argument('--backup', '-b', action='store_true', help='Create a backup of the original config file.')
+    prettify_yaml_parser.add_argument('--emoji', '-e', action='store_true', help='Use emojis in section headers.')
+    prettify_yaml_parser.add_argument('--output', '-o', help='Path to save the prettified config. Defaults to overwriting the original file.')
+
+    prettify_ini_parser = subparsers.add_parser('prettify-ini', help='Prettify an INI configuration file')
+    prettify_ini_parser.add_argument('--file', '-f', required=True, help='Path to the configuration file.')
+    prettify_ini_parser.add_argument('--separator', '-s', choices=SEPARATOR_STYLES.keys(), default='equals', help='Style of separator lines.')
+    prettify_ini_parser.add_argument('--backup', '-b', action='store_true', help='Create a backup of the original config file.')
+    prettify_ini_parser.add_argument('--emoji', '-e', action='store_true', help='Use emojis in section headers.')
+    prettify_ini_parser.add_argument('--output', '-o', help='Path to save the prettified config. Defaults to overwriting the original file.')
+
     return parser.parse_args()
 
 def backup_file(file_path):
@@ -70,7 +92,9 @@ def save_config(data, file_path, fmt):
                 data.write(f)
             else:
                 print("Invalid INI data.")
+                return False
     print(f"Prettified config saved to {file_path}")
+    return True
 
 def generate_separator(style, title=None, emoji=False):
     sep = SEPARATOR_STYLES.get(style, SEPARATOR_STYLES['equals'])
@@ -82,28 +106,27 @@ def generate_separator(style, title=None, emoji=False):
     else:
         return f"# {sep} #"
 
+def _format_section(content, indent=""):
+    lines = []
+    if isinstance(content, list):
+        for item in content:
+            lines.extend(f"{indent}{k}: {v}" for k, v in item.items())
+    elif isinstance(content, dict):
+        for k, v in content.items():
+            if isinstance(v, dict):
+                lines.append(f"{indent}{k}:")
+                lines.extend(f"{indent}  {sk}: {sv}" for sk, sv in v.items())
+            else:
+                lines.append(f"{indent}{k}: {v}")
+    return lines
+
 def prettify_toml(config, style, use_emoji):
     lines = []
-    for table, content in config.items():
-        if isinstance(content, list):  # array of tables
-            for pane in content:
-                lines.append(generate_separator(style, table.capitalize(), use_emoji))
-                for key, value in pane.items():
-                    lines.append(f'{key} = "{value}"' if isinstance(value, str) else f'{key} = {value}')
-                lines.append("")  # add empty line for spacing
-        elif isinstance(content, dict):
-            lines.append(generate_separator(style, table.capitalize(), use_emoji))
-            lines.append(f"[{table}]")
-            for key, value in content.items():
-                if isinstance(value, dict):
-                    lines.append(f"  [{table}.{key}]")
-                    for subkey, subvalue in value.items():
-                        lines.append(f'  {subkey} = "{subvalue}"' if isinstance(subvalue, str) else f'  {subkey} = {subvalue}')
-                elif isinstance(value, list):
-                    lines.append(f"{key} = {value}")
-                else:
-                    lines.append(f'{key} = "{value}"' if isinstance(value, str) else f'{key} = {value}')
-            lines.append("")  # add empty line for spacing
+    for section, content in config.items():
+        lines.append(generate_separator(style, section.capitalize(), use_emoji))
+        lines.append(f"[{section}]")
+        lines.extend(_format_section(content, indent="  "))
+        lines.append("")
     return "\n".join(lines)
 
 def prettify_yaml(config, style, use_emoji):
@@ -126,7 +149,7 @@ def prettify_yaml(config, style, use_emoji):
                     lines.append(f"  {key}: {value}")
                 else:
                     lines.append(f"  {key}: {value}")
-        lines.append("")  # Add empty line for spacing
+        lines.append("")  # add empty line for spacing
     return "\n".join(lines)
 
 def prettify_ini(config, style, use_emoji):
@@ -134,9 +157,8 @@ def prettify_ini(config, style, use_emoji):
     for section in config.sections():
         lines.append(generate_separator(style, section.capitalize(), use_emoji))
         lines.append(f"[{section}]")
-        for key, value in config.items(section):
-            lines.append(f"{key} = {value}")
-        lines.append("")  # Add empty line for spacing
+        lines.extend(f"{key} = {value}" for key, value in config.items(section))
+        lines.append("")  # add empty line for spacing
     return "\n".join(lines)
 
 def prettify_config(data, fmt, style, use_emoji):
@@ -152,11 +174,10 @@ def prettify_config(data, fmt, style, use_emoji):
 def main():
     args = parse_arguments()
     file_path = args.file
-    fmt = args.format
     style = args.separator
     backup = args.backup
     use_emoji = args.emoji
-    output = args.output if args.output else file_path
+    output = args.output or file_path
 
     if not os.path.isfile(file_path):
         print(f"Error: File '{file_path}' does not exist.")
@@ -166,23 +187,23 @@ def main():
         backup_file(file_path)
 
     try:
-        config = load_config(file_path, fmt)
+        config = load_config(file_path, args.command.split('-')[1])
     except Exception as e:
         print(f"Error loading config file: {e}")
         sys.exit(1)
 
     try:
-        prettified = prettify_config(config, fmt, style, use_emoji)
+        prettified = prettify_config(config, args.command.split('-')[1], style, use_emoji)
     except Exception as e:
         print(f"Error prettifying config: {e}")
         sys.exit(1)
 
     try:
-        save_config(prettified, output, fmt)
+        if not save_config(prettified, output, args.command.split('-')[1]):
+            sys.exit(1)
     except Exception as e:
         print(f"Error saving prettified config: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":
     main()
-  
